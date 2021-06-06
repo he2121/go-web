@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/he2121/go-web/hehe"
-	"log"
 	"net/http"
 )
 
@@ -10,13 +9,16 @@ func main() {
 	engine := hehe.New()
 	engine.GET("/", indexHandler)
 	engine.GET("/hello", helloHandler)
+	engine.GET("hello/:name", func(c *hehe.Context) {
+		c.String(http.StatusOK, "hello %s, you're at %s\n", c.Param("name"), c.Path)
+	})
 	engine.POST("/login", func(c *hehe.Context) {
 		c.JSON(http.StatusOK, hehe.H{
 			"username": c.PostForm("username"),
 			"password": c.PostForm("password"),
 		})
 	})
-	log.Fatal(http.ListenAndServe("localhost:1234", engine))
+	engine.Run(":1234")
 }
 
 func indexHandler(c *hehe.Context) {
