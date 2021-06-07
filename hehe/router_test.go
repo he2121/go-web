@@ -2,6 +2,7 @@ package hehe
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
 )
@@ -55,4 +56,22 @@ func TestGetRoute(t *testing.T) {
 		t.Fatal("filepath should be equal to 'he2121/test/1.avi'")
 	}
 	fmt.Printf("matched path: %s, params['filepath']: %s\n", n.pattern, ps["filepath"])
+}
+
+func TestGroup(t *testing.T) {
+	engine := New()
+	v1 := engine.Group("/v1")
+	assert.True(t, v1.prefix == "/v1")
+	assert.True(t, v1.engine == engine)
+	v1.GET("/hello", func(c *Context) {
+	})
+	v1.GET("/hello/:name", func(c *Context) {
+	})
+	assert.True(t, engine.router.handlers["GET-/v1/hello"] != nil)
+	assert.True(t, engine.router.handlers["GET-/v1/hello/:name"] != nil)
+
+	v1 = engine.Group("/v2")
+	v1.GET("/test", func(c *Context) {
+	})
+	assert.True(t, engine.router.handlers["GET-/v2/test"] != nil)
 }
